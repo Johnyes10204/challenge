@@ -1,3 +1,5 @@
+const query = require('../db/indexpersona')
+
 const letters = [];
 var matriz = [];
 
@@ -60,16 +62,12 @@ const lettersmap = async () => {
 module.exports = {
 
     consultar: function (req, res) {
-
-        res.send({
-            "status": "on"
-        })
+        query.getDataDna(req,res)
     },
 
     processDna: async function  (req, res) {
         const dna = req.body.dna;
-
-        if (dna == "" || dna == null ? res.send("Ean es obligatorio") : true);
+        if (dna == "" || dna == null ? res.send("DNA es obligatorio") : true);
         const response = []
         var posiciona = [];
         dna.map((dna) => {
@@ -78,12 +76,10 @@ module.exports = {
                 var any = dna.charAt(index);
                 array_element.push(any)
             }
-
             matriz.push(array_element);
         })
 
         const resletter = await lettersmap();
-
 
         if (resletter) {
             letters.map(e => {
@@ -98,17 +94,20 @@ module.exports = {
                 posiciona = []
             });
         }
+      
         var countdna = 0;
 
         response.filter((element) => {
-
             if (element) {
                 countdna++;
                 return true;
             }
         })
         matriz = [];
-        res.sendStatus(countdna > 1 ? 200 : 403);
+        
+        var resdata = (countdna > 1 ? 200 : 403)
+        query.insertDna(dna, resdata, res);
+        
     }
 
 }
